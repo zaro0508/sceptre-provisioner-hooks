@@ -14,19 +14,23 @@ setup(
     version="1.0.0",
     description="Sceptre hooks to help facilitate the"
                 "Sage auto provisioner",
-    py_modules=['ec2_notify', 'synapse_bucket_notify' ],
+    py_modules=['ec2_notify',
+                'synapse_bucket_notify',
+                's3_web_notify'],
     long_description=readme,
     long_description_content_type="text/markdown",
     author="zaro0508",
     author_email="zaro0508@gmail.com",
     license='Apache2',
-    url="https://github.com/cloudreach/sceptre",
+    url="https://github.com/Sage-Bionetworks/sceptre-provisioner-hooks",
     entry_points={
         'sceptre.hooks': [
             'ec2_notify = '
             'ec2_notify:EC2Notify',
             'synapse_bucket_notify = '
             'synapse_bucket_notify:SynapseBucketNotify',
+            's3_web_notify = '
+            's3_web_notify:S3WebNotify',
         ],
     },
     keywords="sceptre",
