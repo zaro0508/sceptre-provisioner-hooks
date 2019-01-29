@@ -9,25 +9,25 @@ These hooks are utilities for the Sage auto provisioner to run either
 pre or post processing on deployment of AWS resources.
 
 
-Notifications hooks will use the AWS SES service. A sender name and email
-is required to send notifications. A good email to use is the AWS account's
+These hooks will use the AWS SES service to send email notifications.
+A sender name and email is required. A good email to use is the AWS account's
 root email address because it has already been verified by SES.  If you prefer
-to use a different email address and your AWS SES is still in the
+to use a different sender email address and your AWS SES is still in the
 [SES sandbox](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html)
-you must manually verify the sender email before it can be used. 
+then you must manually verify that email before it can be used.
 
 ## Available Hooks
 
 ### ec2_notify
 
 Email notify the resource owner that their EC2 instance has been
-provisioned and provide info to access the instance.
+provisioned and provide the necessary info to access the instance.
 
 Syntax:
 
 ```yaml
 parameter|sceptre_user_data:
-    <name>: !ec2_notification <sender_name> <sender_email>
+    <name>: !ec2_notify <sender_name> <sender_email>
 ```
 
 Example:
@@ -38,9 +38,9 @@ parameters:
   OwnerEmail: "joe.smith@acme.org"
 hooks:
   after_create:
-    - !ec2_notification Scicomp it@acme.org
+    - !ec2_notify Scicomp it@acme.org
   after_update:
-    - !ec2_notification Scicomp it@acme.org
+    - !ec2_notify Scicomp it@acme.org
 ```
 
 ### synapse_bucket_notify
@@ -69,31 +69,26 @@ parameters:
 hooks:
   after_create:
     - !synapse_bucket_notify Scicomp it@acme.org
-  after_update:
-    - !synapse_bucket_notify Scicomp it@acme.org
 ```
 
 ### s3_web_notify
 
 Email notify the resource owner that their S3 website has been
-provisioned and provide info to access the website.
+provisioned and provide the info to access the website.
 
 Syntax:
 
 ```yaml
 parameter|sceptre_user_data:
-    <name>: !synapse_bucket_notify <sender_name> <sender_email>
+    <name>: !s3_web_notify <sender_name> <sender_email>
 ```
 
 Example:
 
 ```
 parameters:
-  SynapseUserName: "jsmith"
   OwnerEmail: "joe.smith@acme.org"
 hooks:
   after_create:
-    - !synapse_bucket_notify Scicomp it@acme.org
-  after_update:
-    - !synapse_bucket_notify Scicomp it@acme.org
+    - !s3_web_notify Scicomp it@acme.org
 ```
