@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import re
 import utils
 
 from botocore.exceptions import ClientError
 from sceptre.hooks import Hook
 
 
-class SynapseBucketNotify(Hook):
+class S3WebNotify(Hook):
     """
     Hook for notifying about provisioned resources.
 
@@ -15,11 +16,11 @@ class SynapseBucketNotify(Hook):
 
     """
     def __init__(self, *args, **kwargs):
-        super(SynapseBucketNotify, self).__init__(*args, **kwargs)
+        super(S3WebNotify, self).__init__(*args, **kwargs)
 
     def run(self):
         """
-        Notify resource owner of the provisioned bucket.
+        Notify resource owner of the provisioned website.
         """
         args = self.argument
         utils.validate_args(args)
@@ -43,20 +44,20 @@ class SynapseBucketNotify(Hook):
 
         stack_parameters = response['Stacks'][0]['Parameters']
         stack_outputs = response['Stacks'][0]['Outputs']
-        synapse_username = utils.get_parameter_value(stack_parameters, 'SynapseUserName')
-        allow_write_bucket = utils.get_parameter_value(stack_parameters, 'AllowWriteBucket')
         owner_email = utils.get_parameter_value(stack_parameters, 'OwnerEmail')
-        # Bucket name is auto generated and only available in CF outputs
-        synapse_bucket = utils.get_output_value(
+        website_bucket = utils.get_output_value(
             stack_outputs,
-            self.stack.region + '-' + self.stack.external_name + '-' + 'SynapseExternalBucket')
-        self.logger.info("Synapse external bucket name: " +  synapse_bucket)
+            self.stack.region + '-' + self.stack.external_name + '-' + 'WebsiteBucket')
+        self.logger.info("Website bucket name: " +  website_bucket)
+        cloudfront_endpoint = utils.get_output_value(
+            stack_outputs,
+            self.stack.region + '-' + self.stack.external_name + '-' + 'CloudfrontEndpoint')
+        self.logger.info("Cloudfront endpoint: " +  cloudfront_endpoint)
 
-        if allow_write_bucket.lower() == 'true':
-            self.create_owner_file(synapse_username, synapse_bucket)
-
-        message =  ("A S3 synapse bucket has been provisioned on your behalf. "
-                    "The bucket's name is " + synapse_bucket)
+        message =  ("A cloudfront website has been provisioned on your behalf."
+                    " The contents of the website is in an S3 bucket. "
+                    " The bucket name is " + website_bucket +
+                    " The cloudfront endpoint is " + cloudfront_endpoint)
         try:
             response = utils.email_owner(
                 self.stack,
@@ -69,24 +70,3 @@ class SynapseBucketNotify(Hook):
         else:
             self.logger.info("Email sent to " + owner_email)
             self.logger.info("Message ID: " + response['MessageId'])
-
-    def create_owner_file(self, synapse_username, synapse_bucket):
-        connection_manager = self.stack.template.connection_manager
-        OWNER_FILE = 'owner.txt'
-        try:
-            response = connection_manager.call(
-                service="s3",
-                command="put_object",
-                kwargs={"Body": synapse_username.encode('UTF-8'),
-                        "Bucket": synapse_bucket,
-                        "Key": OWNER_FILE
-                        },
-                profile=self.stack.profile,
-                region=self.stack.region,
-                stack_name=self.stack.name
-            )
-        except ClientError as e:
-            self.logger.error(e.response['Error']['Message'])
-            raise e
-        else:
-            self.logger.info("Created " + synapse_bucket + "/" + OWNER_FILE),
