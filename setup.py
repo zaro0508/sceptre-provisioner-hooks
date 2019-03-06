@@ -15,6 +15,7 @@ setup(
     description="Sceptre hooks to help facilitate the"
                 "Sage auto provisioner",
     py_modules=['ec2_notify',
+                's3_notify',
                 'synapse_bucket_notify',
                 's3_web_notify',
                 'utils',
@@ -30,6 +31,8 @@ setup(
         'sceptre.hooks': [
             'ec2_notify = '
             'ec2_notify:EC2Notify',
+            's3_notify = '
+            's3_notify:S3Notify',
             'synapse_bucket_notify = '
             'synapse_bucket_notify:SynapseBucketNotify',
             's3_web_notify = '

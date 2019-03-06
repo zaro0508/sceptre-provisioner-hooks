@@ -43,21 +43,21 @@ hooks:
     - !ec2_notify Scicomp it@acme.org
 ```
 
-### synapse_bucket_notify
+### s3_notify
 
-Run additional setup after creating a Synapse external bucket.
+Run additional setup after creating a bucket:
+
+* For a general bucket send an email to the bucket owner with bucket info.
+* For a Synapse read-write bucket create an owner.txt file and upload it to the bucket then send notification.  
 For more information please refer to the
 [synapse external bucket documention](http://docs.synapse.org/articles/custom_storage_location.html)
 
-Does the following after creation of the bucket:
-* Upload an owner.txt file to the bucket.
-* Send an email to the bucket owner with the bucket info.
 
 Syntax:
 
 ```yaml
 parameter|sceptre_user_data:
-    <name>: !synapse_bucket_notify <sender_name> <sender_email>
+    <name>: !s3_notify <sender_name> <sender_email>
 ```
 
 Example:
@@ -92,3 +92,36 @@ hooks:
   after_create:
     - !s3_web_notify Scicomp it@acme.org
 ```
+
+
+## Deprecated Hooks
+These hooks are not supported anymore.
+
+### synapse_bucket_notify
+
+Run additional setup after creating a Synapse external bucket.
+For more information please refer to the
+[synapse external bucket documention](http://docs.synapse.org/articles/custom_storage_location.html)
+
+Does the following after creation of the bucket:
+* Upload an owner.txt file to the bucket.
+* Send an email to the bucket owner with the bucket info.
+
+Syntax:
+
+```yaml
+parameter|sceptre_user_data:
+    <name>: !synapse_bucket_notify <sender_name> <sender_email>
+```
+
+Example:
+
+```
+parameters:
+  SynapseUserName: "jsmith"
+  OwnerEmail: "joe.smith@acme.org"
+hooks:
+  after_create:
+    - !synapse_bucket_notify Scicomp it@acme.org
+```
+
