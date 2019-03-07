@@ -68,7 +68,7 @@ parameters:
   OwnerEmail: "joe.smith@acme.org"
 hooks:
   after_create:
-    - !synapse_bucket_notify Scicomp it@acme.org
+    - !s3_notify Scicomp it@acme.org
 ```
 
 ### s3_web_notify
