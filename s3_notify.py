@@ -44,25 +44,33 @@ class S3Notify(Hook):
 
         stack_parameters = response['Stacks'][0]['Parameters']
         stack_outputs = response['Stacks'][0]['Outputs']
-        allow_write_bucket = utils.get_parameter_value(stack_parameters, 'AllowWriteBucket')
         owner_email = utils.get_parameter_value(stack_parameters, 'OwnerEmail')
-        # Bucket name is auto generated and only available in CF outputs
-        synapse_bucket = utils.get_output_value(
-            stack_outputs,
-            self.stack.region + '-' + self.stack.external_name + '-' + 'SynapseExternalBucket')
-        self.logger.info("Synapse external bucket name: " +  synapse_bucket)
 
-        synapse_username = ""  # optional parameter
+        # handle optional parameters
+        try:
+            allow_write_bucket = utils.get_parameter_value(stack_parameters, 'AllowWriteBucket')
+        except UndefinedParameterException as e:
+            allow_write_bucket = "false"
+
         try:
             synapse_username = utils.get_parameter_value(stack_parameters, 'SynapseUserName')
+            if synapse_username:
+                self.logger.info("synapse user name: " + synapse_username)
         except UndefinedParameterException as e:
-            pass
+            synapse_username = ""
 
-        if allow_write_bucket.lower() == 'true' and synapse_username != "":
-            self.create_owner_file(synapse_username, synapse_bucket)
+        # Setup for a synapse bucket
+        # Bucket name is auto generated and only available in CF outputs
+        s3_bucket = utils.get_output_value(
+            stack_outputs,
+            self.stack.region + '-' + self.stack.external_name + '-' + 'SynapseExternalBucket')
+        self.logger.info("bucket name: " +  s3_bucket)
+        if allow_write_bucket.lower() == 'true' and synapse_username:
+            self.create_owner_file(synapse_username, s3_bucket)
 
-        message =  ("A S3 synapse bucket has been provisioned on your behalf. "
-                    "The bucket's name is " + synapse_bucket)
+        # Send notification to resource owner
+        message =  ("A S3 bucket has been provisioned on your behalf. "
+                    "The bucket's name is " + s3_bucket)
         try:
             response = utils.email_owner(
                 self.stack,
@@ -76,7 +84,7 @@ class S3Notify(Hook):
             self.logger.info("Email sent to " + owner_email)
             self.logger.info("Message ID: " + response['MessageId'])
 
-    def create_owner_file(self, synapse_username, synapse_bucket):
+    def create_owner_file(self, synapse_username, s3_bucket):
         connection_manager = self.stack.template.connection_manager
         OWNER_FILE = 'owner.txt'
         try:
@@ -84,7 +92,7 @@ class S3Notify(Hook):
                 service="s3",
                 command="put_object",
                 kwargs={"Body": synapse_username.encode('UTF-8'),
-                        "Bucket": synapse_bucket,
+                        "Bucket": s3_bucket,
                         "Key": OWNER_FILE
                         },
                 profile=self.stack.profile,
@@ -95,4 +103,4 @@ class S3Notify(Hook):
             self.logger.error(e.response['Error']['Message'])
             raise e
         else:
-            self.logger.info("Created " + synapse_bucket + "/" + OWNER_FILE),
+            self.logger.info("Created " + s3_bucket + "/" + OWNER_FILE),
