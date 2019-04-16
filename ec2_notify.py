@@ -74,23 +74,23 @@ class EC2Notify(Hook):
 
         if 'public_ip' in ec2_info:
             message = message + ("<b> Resource Connection Info </b> <br />"
-                                 "For a Linux resource: <br />"
-                                 "open a terminal, then type "
-                                 "ssh YOUR_JUMPCLOUD_USERNAME@IP_ADDRESS "
+                                 "Access Linux: "
+                                 "Open a terminal, then type ssh YOUR_JUMPCLOUD_USERNAME@IP_ADDRESS "
                                  "(i.e. ssh jsmith@" + ec2_info["public_ip"] + ") <br />"
-                                 "For a Windows resource: <br />"
-                                 "Connect to " + ec2_info["public_ip"] + " with your Jumpcloud credentials using a "
-                                 "<a href=\"https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients\">RDP client</a> ")
+                                 "Access Windows: "
+                                 "Run a "
+                                 "<a href=\"https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients\">RDP client</a> "
+                                 "then connect to " + ec2_info["private_ip"] + " with your Jumpcloud credentials")
         else:
             message = message + ("<b> Resource Connection Info </b> <br />"
                                  "Login to the Sage VPN <br />"
-                                 "For a Linux resource: <br />"
-                                 "open a terminal, then type "
-                                 "ssh YOUR_JUMPCLOUD_USERNAME@IP_ADDRESS "
+                                 "Access Linux: "
+                                 "Open a terminal, then type ssh YOUR_JUMPCLOUD_USERNAME@IP_ADDRESS "
                                  "(i.e. ssh jsmith@" + ec2_info["private_ip"] + ") <br />"
-                                 "For a Windows resource: <br />"
-                                 "Connect to " + ec2_info["private_ip"] + " with your Jumpcloud credentials using a "
-                                 "<a href=\"https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients\">RDP client</a> ")
+                                 "Access Windows: "
+                                 "Run a "
+                                 "<a href=\"https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients\">RDP client</a> "
+                                 "then connect to " + ec2_info["private_ip"] + " with your Jumpcloud credentials")
         try:
             response = utils.email_owner(
                 self.stack,
