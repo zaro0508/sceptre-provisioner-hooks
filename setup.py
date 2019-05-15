@@ -6,7 +6,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 install_requirements = [
-    "sceptre>=2.0"
+    "sceptre>=2.1.2"
 ]
 
 setup(
