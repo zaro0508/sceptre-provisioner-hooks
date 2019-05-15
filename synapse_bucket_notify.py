@@ -28,7 +28,7 @@ class SynapseBucketNotify(Hook):
 
         # Defaults parameters allows user to optionally specify them in scepter
         # Therefore we need to get parameter values from cloudformation
-        connection_manager = self.stack.template.connection_manager
+        connection_manager = self.stack.connection_manager
         try:
             response = connection_manager.call(
                 service="cloudformation",
@@ -71,7 +71,7 @@ class SynapseBucketNotify(Hook):
             self.logger.info("Message ID: " + response['MessageId'])
 
     def create_owner_file(self, synapse_username, synapse_bucket):
-        connection_manager = self.stack.template.connection_manager
+        connection_manager = self.stack.connection_manager
         OWNER_FILE = 'owner.txt'
         try:
             response = connection_manager.call(

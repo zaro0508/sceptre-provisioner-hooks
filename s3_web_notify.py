@@ -29,7 +29,7 @@ class S3WebNotify(Hook):
 
         # Defaults parameters allows user to optionally specify them in scepter
         # Therefore we need to get parameter values from cloudformation
-        connection_manager = self.stack.template.connection_manager
+        connection_manager = self.stack.connection_manager
         try:
             response = connection_manager.call(
                 service="cloudformation",
