@@ -11,7 +11,7 @@ install_requirements = [
 
 setup(
     name='sceptre-provisioner-hooks',
-    version="1.0.0",
+    version="1.0.1",
     description="Sceptre hooks to help facilitate the"
                 "Sage auto provisioner",
     py_modules=['ec2_notify',
