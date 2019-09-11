@@ -52,12 +52,13 @@ class S3WebNotify(Hook):
         cloudfront_endpoint = utils.get_output_value(
             stack_outputs,
             self.stack.region + '-' + self.stack.external_name + '-' + 'CloudfrontEndpoint')
-        self.logger.info("Cloudfront endpoint: " +  cloudfront_endpoint)
+        self.logger.info("Cloudfront endpoint: " + cloudfront_endpoint)
 
-        message =  ("A cloudfront website has been provisioned on your behalf."
-                    " The contents of the website is in an S3 bucket. "
-                    " The bucket name is " + website_bucket +
-                    " The cloudfront endpoint is " + cloudfront_endpoint)
+        message =  ("A cloudfront website has been provisioned on your behalf. "
+                    "The contents of the website is in an S3 bucket.\n"
+                    " Cloudformation stack: " + self.stack.name + "\n"
+                    " Bucket name: " + website_bucket + "\n"
+                    " Cloudfront endpoint: " + cloudfront_endpoint + "\n")
         try:
             response = utils.email_owner(
                 self.stack,
