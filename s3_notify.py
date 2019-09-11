@@ -69,8 +69,9 @@ class S3Notify(Hook):
             self.create_owner_file(synapse_username, s3_bucket)
 
         # Send notification to resource owner
-        message =  ("A S3 bucket has been provisioned on your behalf. "
-                    "The bucket's name is " + s3_bucket)
+        message =  ("A S3 bucket has been provisioned on your behalf.\n"
+                    " Cloudformation stack: " + self.stack.name + "\n"
+                    " Bucket name: " + s3_bucket + "\n")
         try:
             response = utils.email_owner(
                 self.stack,
